@@ -1,0 +1,14 @@
+# to store configuration settings
+kind: ConfigMap
+
+apiVersion: v1
+
+metadata:
+  # name of the config-map
+  name: asset-management-frontend-configmap
+  # separate namespace to organize cluster's resource
+  namespace: {{ .Release.namespace }}
+
+# key-value pair data
+data:
+  SERVER_BASE_URL: {{ .Values.configMap.SERVER_BASE_URL }}
