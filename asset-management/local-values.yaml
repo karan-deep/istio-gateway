@@ -1,0 +1,44 @@
+# Default values for asset_management.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+configMap:
+  SERVER_BASE_URL: http://asset-management.com
+
+deployment:
+  frontendImage:
+    name: asset-management-frontend
+    repository: karan1801/asset-management-frontend
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+    port: 80
+  serverImage:
+    name: asset-management-server
+    repository: karan1801/asset-management-server
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+    port: 8080
+
+istio:
+  serviceEntry:
+    host: "*.google.com"
+  destinationRules:
+    - frontend: asset-management-frontend
+    - server: asset-management-server
+
+service:
+  frontend:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  server:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+
+ingress:
+  host: asset-management.com
