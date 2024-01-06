@@ -1,0 +1,25 @@
+# to allow network access to a set of pods
+kind: Service
+
+apiVersion: v1
+
+metadata:
+  # name of the service
+  name: asset-management-server-service
+  # separate namespace to organize cluster's resource
+  namespace: {{ .Release.namespace }}
+  # labels for the service
+  labels:
+    app: asset-management-server-service
+
+spec:
+  # service is only accessible from within the cluster
+  type: ClusterIP
+
+  # pods which is needed to be connected
+  selector:
+    app: asset-management-server-pod
+
+  ports:
+    - port: {{ .Values.service.server.port }}
+      targetPort: {{ .Values.service.server.targetPort }}
