@@ -1,0 +1,37 @@
+# to control a group of similar pods
+kind: Deployment
+
+apiVersion: apps/v1
+
+metadata:
+  # name of the deployment
+  name: asset-management-server-deployment
+  # separate namespace to organize cluster's resource
+  namespace: {{ .Release.namespace }}
+  # labels for the deployment
+  labels:
+    app: asset-management-server-deployment
+
+spec:
+  # copies of pod
+  replicas: {{ .Values.replicaCount }}
+
+  # pods which is needed to be managed
+  selector:
+    matchLabels:
+      app: asset-management-server-pod
+
+  template:
+    metadata:
+      # labels for the pod
+      labels:
+        app: asset-management-server-pod
+
+    spec:
+      # container specification
+      containers:
+        - name: {{ .Values.deployment.serverImage.name }}
+          image: "{{ .Values.deployment.serverImage.repository  }}:{{ .Values.deployment.serverImage.tag }}"
+          imagePullPolicy: {{ .Values.deployment.serverImage.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.deployment.serverImage.port }}
