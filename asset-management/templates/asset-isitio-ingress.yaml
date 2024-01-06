@@ -1,0 +1,27 @@
+# allows access to services from outside the cluster and filters out the hosts
+kind: Gateway
+
+apiVersion: networking.istio.io/v1alpha3
+
+metadata:
+  # name of the istio ingress gateway
+  name: asset-management-gateway
+
+  # separate namespace to organize cluster's resource
+  namespace: {{ .Release.namespace }}
+
+spec:
+  # the selector matches the ingress gateway pod labels.
+  # shared istio ingress
+  selector:
+    istio: ingressgateway
+
+  servers:
+  # port numbers listened by the gateway
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    # host whitelisted by the gateway to accept traffic  
+    hosts:
+    - {{ .Values.ingress.host }}
