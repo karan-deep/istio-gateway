@@ -1,0 +1,25 @@
+# looping through destination rules helm value
+{{- range $i, $value := .Values.istio.destinationRules }}
+
+# defining policies related to the communication between services
+kind: DestinationRule
+
+apiVersion: networking.istio.io/v1alpha3
+
+{{- range $key, $val := $value }}
+
+metadata:
+  # name of the destination rule
+  name: {{ $val }}-destination-rule
+
+spec:
+  # host selector for the k8s service
+  host: {{ $val }}-service.asset.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      # load balancing algorithms to distribute traffic
+      simple: ROUND_ROBIN
+
+{{- end }}
+
+{{- end }}
