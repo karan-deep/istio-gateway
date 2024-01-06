@@ -1,0 +1,27 @@
+# allow entries to pass through the egress gateway - outbound traffic
+kind: ServiceEntry
+
+apiVersion: networking.istio.io/v1beta1
+
+metadata:
+  # name of the entry
+  name: asset-management-service-entry
+  # separate namespace to organize cluster's resource
+  namespace: {{ .Release.namespace }}
+
+spec:
+  # host which is allowed to access from cluster
+  hosts:
+    - {{ .Values.istio.serviceEntry.host | quote }}
+
+  # host exists outside of the mesh
+  location: MESH_EXTERNAL
+
+  # IP resolution type - as will be using wild card host. None should be selected instead of DNS
+  resolution: NONE
+
+  # port of the host and protocol
+  ports:
+    - number: 443
+      name: https
+      protocol: HTTPS
