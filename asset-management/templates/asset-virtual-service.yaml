@@ -1,0 +1,32 @@
+# routing rules and the flow of traffic between services
+kind: VirtualService
+
+apiVersion: networking.istio.io/v1alpha3
+
+metadata:
+  # name of the virtual service
+  name: asset-management-virtual-service
+  # separate namespace to organize cluster's resource
+  namespace: {{ .Release.namespace }}
+
+spec:
+  # routing plans would be applied to the given hosts
+  hosts:
+  - {{ .Values.ingress.host }}
+  gateways:
+  - asset-management-gateway
+  http:
+  - name: "server"
+    match:
+    - uri:
+         prefix: "/api"
+    route:
+      - destination:
+          host: asset-management-server-service.asset.svc.cluster.local
+  - name: "frontend"
+    match:
+    - uri:
+         prefix: "/"
+    route:
+      - destination:
+          host: asset-management-frontend-service.asset.svc.cluster.local
