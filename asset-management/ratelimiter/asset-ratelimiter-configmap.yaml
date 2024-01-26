@@ -1,0 +1,19 @@
+# to store configuration settings
+kind: ConfigMap
+
+apiVersion: v1
+
+metadata:
+  # name of the config-map
+  name: ratelimit-config
+
+# providing the content for a ConfigMap in YAML format
+data:
+  config.yaml: |
+    domain: ratelimit
+    descriptors:
+      - key: PATH
+        value: "/api"
+        rate_limit:
+          unit: minute
+          requests_per_unit: 5
