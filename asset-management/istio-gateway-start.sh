@@ -55,6 +55,15 @@ end tell'
 echo "Waiting 30 secs...";
 sleep 30;
 
+# installing redis and creating a global rate limit service
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/ratelimit/rate-limit-service.yaml
+
+# applying ratelimiter config and CRD
+kubectl apply -f ./ratelimiter
+
+echo "Waiting for ratelimiter pod to get ready";
+kubectl wait --for=condition=ready pod -l app=ratelimit
+
 # mapping hostname to minikube's IP address
 echo "$(kubectl get services istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}' -n istio-system) asset-management.com" | sudo tee -a /etc/hosts
 
