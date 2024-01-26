@@ -22,7 +22,7 @@
 > command terminated with exit code 35
 
 ## Ingress Gateway
-- Istio ingress gateway would be accepting requests from the given hosts mentioned in the configuration installed
+- Istio ingress gateway would be accepting requests from the given hosts mentioned in the configuration installed.
 > ``` curl -H "Host:asset-management.com" http://asset-management.com/login ``` 
 
 **This will allowing fetching our application page with 200 status code.**
@@ -38,9 +38,9 @@
 
 ## Rate Limiting
 
-- Istio provides rate-limiting via Envoy to limit network traffic to prevent users from exhausting system resources
+- Istio provides rate-limiting via Envoy to limit network traffic to prevent users from exhausting system resources.
 
-**Global Rate limit Configuration is applied for our entire service mesh. Our /api can be accessed 5 times within one minute which will be refilled/renew.**
+**Global Rate limit Configuration is applied for our entire service mesh. Our /api can be accessed 5 times within one minute which will be refilled/renewed.**
 
 > ``` curl -IH "Host:asset-management.com" http://asset-management.com/api ```
 
