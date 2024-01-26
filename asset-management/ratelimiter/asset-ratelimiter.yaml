@@ -1,0 +1,67 @@
+
+# extending the behavior of network traffic passing through the proxy
+kind: EnvoyFilter
+
+apiVersion: networking.istio.io/v1alpha3
+
+metadata:
+  # name of the envoy filter
+  name: asset-management-ratelimit
+
+  # separate namespace to organize cluster's resource
+  namespace: istio-system
+
+spec:
+  workloadSelector:
+    # select by label in the same namespace
+    labels:
+      istio: ingressgateway
+  configPatches:
+    # envoy config modify
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          filterChain:
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+              subFilter:
+                name: "envoy.filters.http.router"
+      patch:
+        operation: INSERT_BEFORE
+        # Adds the Envoy Rate Limit Filter in HTTP filter chain.
+        value:
+          name: envoy.filters.http.ratelimit
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
+            # domain can be anything! Match it to the ratelimter service config
+            domain: ratelimit
+            # not allowing traffic in case of communication failure between rate limiting service and the proxy
+            failure_mode_deny: true
+            # timeout in milliseconds for the rate limit
+            timeout: 10s
+            # adding envoy RateLimit headers for remaining requests, total allowed within time period and when to refill
+            enable_x_ratelimit_headers: DRAFT_VERSION_03
+            rate_limit_service:
+              grpc_service:
+                envoy_grpc:
+                  cluster_name: outbound|8081||ratelimit.default.svc.cluster.local
+                  authority: ratelimit.default.svc.cluster.local
+              transport_api_version: V3
+    - applyTo: VIRTUAL_HOST
+      match:
+        context: GATEWAY
+        routeConfiguration:
+          vhost:
+            name: ""
+            route:
+              action: ANY
+      patch:
+        operation: MERGE
+        # Applies the rate limit rules.
+        value:
+          rate_limits:
+            - actions: # any actions in here
+              - request_headers:
+                  header_name: ":path"
+                  descriptor_key: "PATH"
