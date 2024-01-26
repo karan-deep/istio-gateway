@@ -31,9 +31,28 @@
 
 **This request would be declined as Ingress Gateway needs to know which services to route the incoming requests to based on the specified host.**
 
-> HTTP/1.1 404 Not Found
-> date: Sun, 07 Jan 2024 00:24:29 GMT
-> server: istio-envoy
+> HTTP/1.1 404 Not Found\
+> date: Sun, 07 Jan 2024 00:24:29 GMT\
+> server: istio-envoy\
+> transfer-encoding: chunked
+
+## Rate Limiting
+
+- Istio provides rate-limiting via Envoy to limit network traffic to prevent users from exhausting system resources
+
+**Global Rate limit Configuration is applied for our entire service mesh. Our /api can be accessed 5 times within one minute which will be refilled/renew.**
+
+> ``` curl -IH "Host:asset-management.com" http://asset-management.com/api ```
+
+**Results after reaching the limit -**
+
+> HTTP/1.1 429 Too Many Requests\
+> x-envoy-ratelimited: true\
+> x-ratelimit-limit: 5, 5;w=60 : requests allowed per 60 secs\
+> x-ratelimit-remaining: 0 : remaining requests for the given time\
+> x-ratelimit-reset: 53 : remaining time for requests refill\
+> date: Fri, 26 Jan 2024 01:20:07 GMT\
+> server: istio-envoy\
 > transfer-encoding: chunked
 
 ![Screen Shot 2022-12-23 at 7 46 50 PM](https://user-images.githubusercontent.com/77373766/209420202-7007780a-630e-48d8-9b61-b14faa518eab.png)
